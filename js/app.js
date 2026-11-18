@@ -43,8 +43,7 @@ const formularios = {
 
 const el = id => document.getElementById(id);
 const buscar = (lista, id) => lista.find(item => item.id === id);
-const num = valor => valor.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
-const arredondar = valor => Math.round(valor * 10) / 10;
+const num = valor => valor.toLocaleString("pt-BR", { maximumFractionDigits: 3 });
 const arredondarCima = valor => Math.ceil(valor - 1e-9);
 const precisao = valor => Math.round(valor * 1000) / 1000;
 const formatarData = iso => iso.split("-").reverse().join("/");
@@ -52,14 +51,14 @@ const diaMes = iso => `${iso.slice(8)}/${iso.slice(5, 7)}`;
 const mesCurto = iso => new Date(`${iso}T12:00:00`).toLocaleDateString("pt-BR", { month: "short" }).replace(".", "");
 const maiuscula = texto => texto ? texto[0].toUpperCase() + texto.slice(1) : "";
 const esc = texto => String(texto ?? "").replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
-const icone = nome => `<span class="icone">${nome}</span>`;
+const icone = nome => `<span class="icone" aria-hidden="true">${nome}</span>`;
 const badge = (texto, cor) => `<span class="badge badge-${cor}">${texto}</span>`;
 const vazio = (nomeIcone, texto, classe = "") => `<div class="vazio ${classe}">${icone(nomeIcone)}<p>${texto}</p></div>`;
 const linhaVazia = (colunas, nomeIcone, texto) => `<tr class="linha-vazia"><td colspan="${colunas}">${vazio(nomeIcone, texto)}</td></tr>`;
 const opcoes = (lista, textoVazio) => `<option value="">${textoVazio}</option>` + lista.map(([valor, texto]) => `<option value="${valor}">${esc(texto)}</option>`).join("");
 const ordenado = (lista, chave) => [...lista].sort((a, b) => chave(a).localeCompare(chave(b)));
 const sincronizar = area => area.querySelectorAll("select[onchange]").forEach(select => select.dispatchEvent(new Event("change")));
-const botoesLinha = (tabela, id) => `<button class="btn-icone" data-editar="${tabela}" data-id="${id}" title="Editar">${icone("edit")}</button><button class="btn-icone" data-excluir="${tabela}" data-id="${id}" title="Excluir">${icone("delete")}</button>`;
+const botoesLinha = (tabela, id) => `<button class="btn-icone" data-editar="${tabela}" data-id="${id}" title="Editar" aria-label="Editar">${icone("edit")}</button><button class="btn-icone" data-excluir="${tabela}" data-id="${id}" title="Excluir" aria-label="Excluir">${icone("delete")}</button>`;
 
 const dataLocal = data => [data.getFullYear(), data.getMonth() + 1, data.getDate()].map(n => String(n).padStart(2, "0")).join("-");
 const hoje = dataLocal(new Date());
@@ -145,6 +144,7 @@ function turnoTag(turno) {
 
 function barraEstoque(produto) {
     const total = provisionado(produto.id);
+    if (!total) return `<div class="barra" title="Sem empenho vigente"></div>`;
     const pct = total ? Math.min(100, produto.total_estoque / total * 100) : 0;
     const nivel = pct < 5 ? "critico" : pct < 15 ? "atencao" : "ok";
     return `<div class="barra"><i class="${nivel}" style="width:${Math.max(pct, 2)}%"></i></div>`;
@@ -179,10 +179,12 @@ function previsao(inicio) {
         .sort((a, b) => nomeProduto(a.produto).localeCompare(nomeProduto(b.produto)));
 }
 
+// Os botões abrem o formulário já com o produto e a quantidade que falta.
 function situacaoNecessidade({ produto, necessario, previsto }) {
     if (necessario <= previsto) return ["Estoque suficiente", "verde", ""];
-    if (necessario <= previsto + saldoEmpenho(produto.id)) return ["Solicitar entrega", "laranja", `<button class="btn-mini" data-novo="agenda_entrega_empenho">Solicitar entrega</button>`];
-    return ["Sem empenho", "vermelho", `<button class="btn-mini" data-novo="empenho">Cadastrar empenho</button>`];
+    const saldo = saldoEmpenho(produto.id);
+    if (necessario <= previsto + saldo) return ["Solicitar entrega", "laranja", `<button class="btn-mini" data-novo="agenda_entrega_empenho" data-produto="${produto.id}" data-quantidade="${arredondarCima(necessario - previsto)}">Solicitar entrega</button>`];
+    return ["Sem empenho", "vermelho", `<button class="btn-mini" data-novo="empenho" data-produto="${produto.id}" data-quantidade="${arredondarCima(necessario - previsto - saldo)}">Cadastrar empenho</button>`];
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -320,7 +322,7 @@ function renderEntregaLista() {
         <button class="opcao-agendado${a.id === agendadoSelecionado ? " selecionado" : ""}" onclick="selecionarAgendado(${a.id})">
             ${turnoTag(a.turno)}
             <span class="opcao-info"><strong>Lanche ${a.fk_lanche}</strong><small>${a.quant_prevista} previstos</small></span>
-            ${a.situacao === "entregue" ? `<span class="icone status-ok">task_alt</span>` : `<span class="icone status-pendente">schedule</span>`}
+            ${a.situacao === "entregue" ? `<span class="icone status-ok" role="img" aria-label="Entregue">task_alt</span>` : `<span class="icone status-pendente" role="img" aria-label="Pendente">schedule</span>`}
         </button>`).join("") : vazio("event_busy", "Nenhum lanche agendado nesta data.");
 
     renderEntregaDetalhe();
@@ -358,7 +360,7 @@ function renderEntregaDetalhe() {
             </div>
             <div class="resumo-entrega" data-linha>
                 <div class="resumo-box"><span>Lanches previstos</span><strong>${agendado.quant_prevista}</strong></div>
-                <label class="resumo-box"><span>Lanches entregues</span><input class="input-grande" type="number" name="quant_entregue" min="0" max="${agendado.quant_prevista}" step="1" required value="${entregue ? agendado.quant_entregue : agendado.quant_prevista}" data-planejado="${agendado.quant_prevista}" data-unidade="" oninput="atualizarSobra(this)"${bloqueio}></label>
+                <label class="resumo-box"><span>Lanches entregues</span><input class="input-grande" type="number" name="quant_entregue" min="0" max="${agendado.quant_prevista}" step="1" required value="${entregue ? agendado.quant_entregue : agendado.quant_prevista}" data-planejado="${agendado.quant_prevista}" data-unidade="" oninput="atualizarLanchesEntregues(this)"${bloqueio}></label>
                 <div class="resumo-box"><span>Sobra</span><strong class="sobra"></strong></div>
             </div>
             <div class="tabela-wrap tabela-borda">
@@ -366,7 +368,7 @@ function renderEntregaDetalhe() {
                     <thead><tr><th>Item do lanche</th><th>Referência</th><th class="num">Planejado</th><th class="num">Entregue</th><th class="num">Sobra</th><th>Observação</th></tr></thead>
                     <tbody>${itensLanche(lanche.id).map(item => {
                         const produto = buscar(dados.produto, item.fk_produto);
-                        const planejado = arredondar(porLanche(item) * agendado.quant_prevista);
+                        const planejado = precisao(porLanche(item) * agendado.quant_prevista);
                         const registro = registros.find(r => r.fk_item_lanche === item.id) || { quant_entregue: planejado, observacoes: "" };
                         const ref = referencias[item.referencia_consumo];
                         return `
@@ -374,7 +376,7 @@ function renderEntregaDetalhe() {
                                 <td><strong>${esc(nomeProduto(produto))}</strong><small>${esc(consumo(item))} por lanche</small></td>
                                 <td><span class="ref ${ref.classe}">${ref.nome}</span></td>
                                 <td class="num">${num(planejado)} ${esc(embalagem(produto))}</td>
-                                <td class="num"><input class="input-tabela" type="number" data-campo="quant_entregue" min="0" max="${planejado}" step="any" required value="${registro.quant_entregue}" data-planejado="${planejado}" data-unidade="${esc(embalagem(produto))}" oninput="atualizarSobra(this)"${bloqueio}></td>
+                                <td class="num"><input class="input-tabela" type="number" data-campo="quant_entregue" min="0" max="${planejado}" step="any" required value="${registro.quant_entregue}" data-planejado="${planejado}" data-por-lanche="${porLanche(item)}" data-unidade="${esc(embalagem(produto))}" oninput="this.dataset.editado = 1; atualizarSobra(this)"${bloqueio}></td>
                                 <td class="num sobra"></td>
                                 <td><input class="input-tabela input-texto" type="text" data-campo="observacoes" placeholder="Opcional" value="${esc(registro.observacoes)}"${bloqueio}></td>
                             </tr>`;
@@ -388,8 +390,20 @@ function renderEntregaDetalhe() {
     el("entrega-detalhe").querySelectorAll("[data-planejado]").forEach(atualizarSobra);
 }
 
+// Ao mudar a quantidade de lanches entregues, os itens que o operador não editou acompanham
+// (consumo por lanche × lanches entregues), para o estoque não baixar o que não foi entregue.
+function atualizarLanchesEntregues(input) {
+    atualizarSobra(input);
+    const lanches = Math.max(0, Number(input.value) || 0);
+    input.form.querySelectorAll("[data-item-lanche] [data-campo=quant_entregue]").forEach(campo => {
+        if (campo.dataset.editado) return;
+        campo.value = precisao(Math.min(campo.dataset.porLanche * lanches, campo.dataset.planejado));
+        atualizarSobra(campo);
+    });
+}
+
 function atualizarSobra(input) {
-    const sobra = arredondar(input.dataset.planejado - input.value) || 0;
+    const sobra = precisao(input.dataset.planejado - input.value) || 0;
     const alvo = input.closest("[data-linha]").querySelector(".sobra");
     alvo.textContent = `${num(sobra)} ${input.dataset.unidade}`.trim();
     alvo.classList.toggle("positiva", sobra > 0);
@@ -479,13 +493,14 @@ function renderProdutos() {
     el("tabela-produtos").innerHTML = dados.produto.length ? dados.produto.map(p => {
         const alimento = buscar(dados.alimento, p.fk_alimento);
         const bebida = alimento.natureza === "bebida";
+        const total = provisionado(p.id);
         return `
             <tr data-filtro="${alimento.natureza}">
                 <td><div class="celula-nome"><span class="avatar-item ${alimento.natureza}">${icone(bebida ? "local_drink" : "inventory_2")}</span><div><strong>${esc(alimento.nome)}</strong><small>${esc(p.descricao)} · cód. ${p.id}</small></div></div></td>
                 <td>${num(p.quant_unit_base)} ${siglaUnidade(alimento.fk_unidade_medida)}<small>por ${esc(embalagem(p))}</small></td>
                 <td>${p.quant_subitens ? `${num(p.quant_subitens)} ${esc(p.nome_subitem || "subitens")}` : "—"}</td>
-                <td class="col-estoque">${barraEstoque(p)}<small>${num(p.total_estoque)} de ${num(provisionado(p.id))} ${esc(embalagem(p))}</small></td>
-                <td class="num">${num(provisionado(p.id))} ${esc(embalagem(p))}</td>
+                <td class="col-estoque">${barraEstoque(p)}<small>${total ? `${num(p.total_estoque)} de ${num(total)} ${esc(embalagem(p))}` : `${num(p.total_estoque)} ${esc(embalagem(p))} · sem empenho vigente`}</small></td>
+                <td class="num">${num(total)} ${esc(embalagem(p))}</td>
                 <td class="acoes">${botoesLinha("produto", p.id)}</td>
             </tr>`;
     }).join("") : linhaVazia(6, "inventory_2", "Nenhum produto cadastrado.");
@@ -519,20 +534,21 @@ function renderEmpenhos() {
                         <span>${icone("date_range")}${formatarData(e.data_inicial)} a ${formatarData(e.data_final)}</span>
                         <span>${icone("inventory_2")}${itens.length} ${itens.length === 1 ? "item" : "itens"}</span>
                     </div>
-                    ${vigente(e) ? badge("Vigente", "verde") : badge("Encerrado", "cinza")}
-                    <button class="btn-icone" data-editar="empenho" data-id="${e.id}" title="Editar">${icone("edit")}</button>
+                    ${e.data_inicial > hoje ? badge("A iniciar", "azul") : vigente(e) ? badge("Vigente", "verde") : badge("Encerrado", "cinza")}
+                    <button class="btn-icone" data-editar="empenho" data-id="${e.id}" title="Editar" aria-label="Editar empenho">${icone("edit")}</button>
                 </div>
                 <div class="tabela-wrap tabela-embutida">
                     <table class="tabela">
-                        <thead><tr><th>Produto</th><th class="num">Empenhado</th><th class="num">Entregue</th><th class="num">Saldo</th><th>Execução</th></tr></thead>
+                        <thead><tr><th>Produto</th><th class="num">Empenhado</th><th class="num">Entregue</th><th class="num">A entregar</th><th>Execução</th></tr></thead>
                         <tbody>${itens.map(item => {
                             const produto = buscar(dados.produto, item.fk_produto);
+                            const solicitado = precisao(aReceberItem(item.id));
                             return `
                                 <tr>
                                     <td><strong>${esc(nomeProduto(produto))}</strong></td>
                                     <td class="num">${num(item.quant_empenhada)} ${esc(embalagem(produto))}</td>
                                     <td class="num">${num(item.quant_entregue)} ${esc(embalagem(produto))}</td>
-                                    <td class="num">${num(item.quant_empenhada - item.quant_entregue)} ${esc(embalagem(produto))}</td>
+                                    <td class="num">${num(item.quant_empenhada - item.quant_entregue)} ${esc(embalagem(produto))}${solicitado ? `<small>${num(solicitado)} já solicitado</small>` : ""}</td>
                                     <td>${barraPercentual(percentual(item.quant_entregue, item.quant_empenhada))}</td>
                                 </tr>`;
                         }).join("")}</tbody>
@@ -777,11 +793,14 @@ function salvarLanche(form) {
     });
 }
 
-function preencherEmpenho(form, registro) {
+function preencherEmpenho(form, registro, extras) {
     const itens = registro ? itensEmpenho(registro.id) : [];
     if (registro) preencherCampos(form, registro);
     form.elements.data_final.min = registro ? registro.data_inicial : "";
-    definirLinhas(form, itens.length || 1).forEach((linha, i) => itens[i] && preencherLinha(linha, itens[i]));
+    const linhas = definirLinhas(form, itens.length || 1);
+    linhas.forEach((linha, i) => itens[i] && preencherLinha(linha, itens[i]));
+    // aberto pela previsão de produtos: já vem com o produto em falta
+    if (!registro && extras.produto) preencherLinha(linhas[0], { fk_produto: Number(extras.produto), quant_empenhada: extras.quantidade });
 }
 
 // Os itens de empenho mantêm o id, porque as entregas solicitadas apontam para eles.
@@ -800,8 +819,18 @@ function salvarEmpenho(form) {
     });
 }
 
-function preencherSolicitacao(form) {
+// Aberto pela previsão de produtos: escolhe o item de empenho vigente com mais saldo do produto.
+function preencherSolicitacao(form, registro, extras) {
     form.elements.data_prevista_entrega.min = hoje;
+    const produtoId = Number(extras.produto);
+    const item = produtoId && itensVigentes(produtoId).filter(i => saldoItemEmpenho(i) > 0)
+        .sort((a, b) => saldoItemEmpenho(b) - saldoItemEmpenho(a))[0];
+    if (!item) return;
+    form.elements.fk_empenho.value = item.fk_empenho;
+    preencherItensEmpenho(form);
+    form.elements.fk_item_empenho.value = item.id;
+    limitarQuantidade(form);
+    form.elements.quant_solicitada.value = Math.min(Number(extras.quantidade) || 0, saldoItemEmpenho(item)) || "";
 }
 
 function salvarSolicitacao(form) {
@@ -833,12 +862,15 @@ const mascaras = {
 function preencherItensEmpenho(form) {
     const empenho = buscar(dados.empenho, Number(form.elements.fk_empenho.value));
     const select = form.elements.fk_item_empenho;
+    const atual = select.value;
     select.innerHTML = empenho
         ? opcoes(itensEmpenho(empenho.id).map(item => {
             const produto = buscar(dados.produto, item.fk_produto);
             return [item.id, `${nomeProduto(produto)} · saldo ${num(saldoItemEmpenho(item))} ${embalagem(produto)}`];
         }), "Selecione")
         : opcoes([], "Selecione o empenho");
+    select.value = atual; // mantém o item escolhido se ele for deste empenho
+    if (select.selectedIndex < 0) select.selectedIndex = 0;
     select.disabled = !empenho;
     limitarQuantidade(form);
 }
@@ -970,6 +1002,55 @@ function finalizarEntrega(id, botao) {
     const observacao = botao.closest("[data-entrega]").querySelector("[data-campo=observacao]").value;
     return comBotao(botao, () => executar(() => banco.salvar("agenda_entrega_empenho", { ...entrega, estado: "finalizado", observacao }),
         "Solicitação finalizada. O restante voltou ao saldo do empenho."));
+}
+
+// ---------------------------------------------------------------------------------------------
+// Base de dados: exportar e importar uma cópia (os dados ficam só no navegador deste aparelho)
+
+function abrirBaseDados() {
+    el("form-base-dados").querySelector(".erro-formulario")?.remove();
+    document.body.classList.remove("menu-aberto");
+    el("modal-base-dados").showModal();
+}
+
+async function exportarBanco() {
+    const form = el("form-base-dados");
+    form.querySelector(".erro-formulario")?.remove();
+    try {
+        const copia = await banco.exportar();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(new Blob([JSON.stringify(copia, null, 2)], { type: "application/json" }));
+        link.download = `merenda-ifrs-backup-${dataLocal(new Date())}.json`;
+        form.append(link); // dentro do modal aberto, que é a única parte da página que aceita cliques
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(link.href), 10000);
+    } catch (erro) {
+        mostrarErroNoFormulario(form, mensagemDeErro(erro));
+        return;
+    }
+    el("modal-base-dados").close();
+    mostrarToast("Banco de dados exportado. Guarde o arquivo baixado.");
+}
+
+async function importarBanco(input) {
+    const arquivo = input.files[0];
+    input.value = ""; // permite escolher o mesmo arquivo de novo
+    if (!arquivo) return;
+    const form = input.form;
+    form.querySelector(".erro-formulario")?.remove();
+
+    let copia;
+    try {
+        copia = JSON.parse(await arquivo.text());
+    } catch {
+        mostrarErroNoFormulario(form, `Nada foi importado: "${arquivo.name}" não é um arquivo exportado por este sistema.`);
+        return;
+    }
+    const exportadoEm = new Date(copia?.exportado_em);
+    const quando = Number.isNaN(exportadoEm.getTime()) ? "" : `\nCópia exportada em ${exportadoEm.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}.`;
+    if (!confirm(`Importar "${arquivo.name}"?${quando}\n\nTodos os dados atuais deste aparelho serão substituídos pelos do arquivo. Esta ação não pode ser desfeita: se precisar dos dados atuais, exporte-os antes.`)) return;
+    await executar(() => banco.importar(copia), "Banco de dados importado.", form);
 }
 
 // ---------------------------------------------------------------------------------------------

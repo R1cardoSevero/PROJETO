@@ -17,6 +17,8 @@
 //       const cardapio = await t.salvar("cardapio", { nome: "Pastel e suco" });
 //       await t.salvar("item_cardapio", { fk_cardapio: cardapio, fk_alimento: 3, quant: 1 });
 //   });
+//   const copia = await banco.exportar();                                         // banco inteiro, para salvar em arquivo
+//   await banco.importar(copia);                                                  // substitui o banco pela cópia
 // Dentro de banco.transacao, aguarde só operações de "t": aguardar outra coisa (fetch, setTimeout)
 // faz o IndexedDB encerrar a transação.
 //
@@ -26,12 +28,15 @@
 // - chaves estrangeiras: não grava referência a registro inexistente e não exclui registro em uso;
 //   excluir um cardápio, lanche, empenho ou lanche agendado exclui junto os itens dele;
 // - restrição 1 da especificação: lanche que já foi entregue não pode mais ser alterado;
-// - entrega de lanche agendado já registrada não pode mais ser alterada, e não entrega mais
-//   lanches (nem produtos) do que o planejado;
+// - entrega de lanche agendado já registrada não pode mais ser alterada, só é registrada a partir
+//   do dia agendado e não entrega mais lanches (nem produtos) do que o planejado;
 // - itens do lanche só usam produtos de alimentos que estão no cardápio do lanche;
+// - a unidade de medida de um alimento não muda depois que ele é usado em produto ou cardápio
+//   (as quantidades desses cadastros estão na unidade antiga);
 // - a entrega solicitada ao fornecedor não passa do saldo do item de empenho;
 // - estoque: o recebimento de uma entrega de empenho soma no total_estoque do produto e no
-//   quant_entregue do item de empenho; a entrega de lanches desconta do total_estoque.
+//   quant_entregue do item de empenho (que só muda assim); a entrega de lanches desconta do
+//   total_estoque.
 
 const banco = (() => {
     const NOME = "merenda-ifrs";
@@ -48,6 +53,10 @@ const banco = (() => {
     const vazio = valor => valor === undefined || valor === null || valor === "";
     const arred = valor => Math.round(valor * 1000) / 1000;
     const emAberto = estado => estado === "agendado" || estado === "entrega_parcial";
+    const hoje = () => {
+        const agora = new Date();
+        return [agora.getFullYear(), agora.getMonth() + 1, agora.getDate()].map(n => String(n).padStart(2, "0")).join("-");
+    };
 
     const texto = (opcoes = {}) => ({ tipo: "texto", ...opcoes });
     const numero = (opcoes = {}) => ({ tipo: "numero", ...opcoes });
@@ -86,6 +95,15 @@ const banco = (() => {
                 fk_unidade_medida: fk("unidade_medida"),
                 natureza: opcao(["comida", "bebida"]),
                 grupo: texto()
+            },
+            antesDeSalvar: async (t, alimento, anterior) => {
+                if (!anterior || anterior.fk_unidade_medida === alimento.fk_unidade_medida) return;
+                const produtos = (await t.buscar("produto", "fk_alimento", alimento.id)).length;
+                const cardapios = (await t.buscar("item_cardapio", "fk_alimento", alimento.id)).length;
+                if (produtos || cardapios) {
+                    const usos = [produtos && `${produtos} produto(s)`, cardapios && `${cardapios} cardápio(s)`].filter(Boolean).join(" e ");
+                    falhar(`Não é possível trocar a unidade de medida: o alimento é usado em ${usos}, com quantidades na unidade atual. Cadastre um novo alimento com a outra unidade.`);
+                }
             }
         },
         produto: {
@@ -187,6 +205,8 @@ const banco = (() => {
                 if (anterior) exigirEntregaAberta(t, anterior);
                 if (agendado.situacao === "entregue" && agendado.quant_entregue === null)
                     falhar("Informe a quantidade de lanches entregues para registrar a entrega.");
+                if (agendado.situacao === "entregue" && anterior?.situacao !== "entregue" && agendado.data > hoje())
+                    falhar(`A entrega só pode ser registrada a partir do dia agendado (${agendado.data.split("-").reverse().join("/")}).`);
                 if (agendado.quant_entregue > agendado.quant_prevista)
                     falhar(`A quantidade de lanches entregues (${agendado.quant_entregue}) não pode passar da prevista (${agendado.quant_prevista}).`);
             },
@@ -216,11 +236,11 @@ const banco = (() => {
                 const itemLanche = await t.obter("item_lanche", item.fk_item_lanche);
                 if (itemLanche.fk_lanche !== agendado.fk_lanche)
                     falhar(`O item de lanche ${itemLanche.id} não faz parte do lanche ${agendado.fk_lanche}, que é o lanche agendado.`);
-                // a tela mostra o planejado com 1 casa decimal; a folga de 0,05 cobre esse arredondamento
+                // a tela arredonda o planejado para 3 casas decimais; a folga de 0,0005 cobre esse arredondamento
                 const produto = await t.obter("produto", itemLanche.fk_produto);
                 const planejado = consumoPorLanche(itemLanche, produto) * agendado.quant_prevista;
-                if (item.quant_entregue > planejado + 0.05 + 1e-9)
-                    falhar(`"${await nomeDoProduto(t, produto)}": a quantidade entregue (${item.quant_entregue}) passa da planejada para este lanche (${Math.round(planejado * 10) / 10}).`);
+                if (item.quant_entregue > planejado + 0.0005 + 1e-9)
+                    falhar(`"${await nomeDoProduto(t, produto)}": a quantidade entregue (${item.quant_entregue}) passa da planejada para este lanche (${arred(planejado)}).`);
             },
             depoisDeSalvar: async (t, item, chave, anterior) => {
                 const usado = arred(item.quant_entregue - (anterior?.quant_entregue ?? 0));
@@ -264,6 +284,8 @@ const banco = (() => {
                 quant_entregue: numero({ minimo: 0, padrao: 0 }) // atualizada pelos recebimentos
             },
             antesDeSalvar: async (t, item, anterior) => {
+                if (item.quant_entregue !== (anterior?.quant_entregue ?? 0) && !t.recebimentos.has(item.id))
+                    falhar("A quantidade entregue do item de empenho só muda com o registro de recebimento das entregas.");
                 if (item.quant_entregue > item.quant_empenhada)
                     falhar("A quantidade entregue não pode passar da quantidade empenhada.");
                 if (!anterior) return;
@@ -321,6 +343,7 @@ const banco = (() => {
                 const recebido = arred(entrega.quant_entregue - (anterior?.quant_entregue ?? 0));
                 if (!recebido) return;
                 const item = await t.obter("item_empenho", entrega.fk_item_empenho);
+                t.recebimentos.add(item.id); // libera a mudança de quant_entregue do item
                 await t.salvar("item_empenho", { ...item, quant_entregue: arred(item.quant_entregue + recebido) });
                 const produto = await t.obter("produto", item.fk_produto);
                 await t.salvar("produto", { ...produto, total_estoque: arred(produto.total_estoque + recebido) });
@@ -591,6 +614,7 @@ const banco = (() => {
         const t = {
             loja,
             entregasRegistradas: new Set(),
+            recebimentos: new Set(),
             listar: nome => esperar(loja(nome).getAll()),
             obter: (nome, chave) => esperar(loja(nome).get(chave)),
             buscar: (nome, indice, valor) => esperar(loja(nome).index(indice).getAll(valor)),
@@ -616,6 +640,76 @@ const banco = (() => {
             try { tx.abort(); } catch { /* a transação já tinha terminado */ }
             throw erro;
         }
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // Exportação e importação (cópia do banco inteiro, para levar os dados a outro aparelho)
+
+    const exportar = () => transacao(async t => ({
+        sistema: NOME,
+        versao: VERSAO,
+        exportado_em: new Date().toISOString(),
+        tabelas: Object.fromEntries(await Promise.all(Object.keys(esquema).map(async nome => [nome, await t.listar(nome)])))
+    }), "readonly");
+
+    // Confere a cópia antes de gravar: tipos e obrigatórios de cada campo, chaves repetidas,
+    // campos únicos e chaves estrangeiras. Devolve os registros de cada tabela já normalizados.
+    function validarCopia(copia) {
+        if (copia?.sistema !== NOME || !Number.isInteger(copia.versao) || typeof copia.tabelas !== "object" || copia.tabelas === null)
+            falhar("o arquivo não é uma cópia do banco de dados da merenda.");
+        if (copia.versao > VERSAO)
+            falhar("o arquivo foi gerado por uma versão mais nova do sistema. Atualize o sistema neste aparelho antes de importar.");
+        for (const nome of Object.keys(copia.tabelas)) tabelaDe(nome);
+
+        const tabelas = {};
+        for (const [nome, tabela] of Object.entries(esquema)) {
+            const lista = copia.tabelas[nome] ?? [];
+            if (!Array.isArray(lista)) falhar(`a tabela de ${tabela.rotulo} está com formato inválido.`);
+            const chaves = new Set();
+            tabelas[nome] = lista.map(registro => {
+                const dados = normalizar(nome, registro);
+                const chave = tabela.chave ? JSON.stringify(tabela.chave.map(campo => dados[campo])) : dados.id;
+                if (chave === undefined) falhar(`há um registro de ${tabela.rotulo} sem id.`);
+                if (chaves.has(chave)) falhar(`o registro ${chave} de ${tabela.rotulo} aparece mais de uma vez.`);
+                chaves.add(chave);
+                return dados;
+            });
+            for (const [campo, def] of Object.entries(tabela.campos)) {
+                if (!def.unico) continue;
+                const valores = tabelas[nome].map(registro => registro[campo]);
+                const repetido = valores.find((valor, i) => valores.indexOf(valor) !== i);
+                if (repetido !== undefined) falhar(`há mais de um ${tabela.rotulo} com ${campo} "${repetido}".`);
+            }
+        }
+        // toda cópia exportada tem as unidades de medida; sem elas não há como cadastrar alimentos
+        if (!tabelas.unidade_medida.length) falhar("o arquivo não tem as unidades de medida, que toda cópia exportada por este sistema tem.");
+
+        const ids = Object.fromEntries(Object.entries(tabelas).map(([nome, lista]) => [nome, new Set(lista.map(registro => registro.id))]));
+        for (const [nome, lista] of Object.entries(tabelas)) {
+            for (const [campo, def] of Object.entries(esquema[nome].campos)) {
+                if (def.tipo !== "fk") continue;
+                const orfao = lista.find(registro => registro[campo] !== null && !ids[def.tabela].has(registro[campo]));
+                if (orfao) falhar(`${esquema[nome].rotulo} aponta para ${esquema[def.tabela].rotulo} com id ${orfao[campo]}, que não existe no arquivo.`);
+            }
+        }
+        return tabelas;
+    }
+
+    // Substitui todo o conteúdo do banco pelo de uma cópia gerada por exportar(). Os registros são
+    // gravados como estão, sem as regras de antesDeSalvar/depoisDeSalvar (que mexeriam de novo no
+    // estoque). Se algo falhar, nada é alterado.
+    async function importar(copia) {
+        let tabelas;
+        try {
+            tabelas = validarCopia(copia);
+        } catch (erro) {
+            throw erro instanceof ErroBanco ? new ErroBanco(`Nada foi importado: ${erro.message}`) : erro;
+        }
+        await transacao(async t => {
+            for (const nome of Object.keys(esquema)) await esperar(t.loja(nome).clear());
+            for (const [nome, lista] of Object.entries(tabelas))
+                await Promise.all(lista.map(registro => esperar(t.loja(nome).add(registro))));
+        }, "readwrite");
     }
 
     // Apaga o banco inteiro. Ele é recriado (só com as unidades de medida) no próximo uso.
@@ -645,6 +739,8 @@ const banco = (() => {
         transacao: operacao => transacao(t => operacao({
             listar: t.listar, obter: t.obter, buscar: t.buscar, salvar: t.salvar, excluir: t.excluir
         }), "readwrite"),
+        exportar,
+        importar,
         apagarBanco
     };
 })();

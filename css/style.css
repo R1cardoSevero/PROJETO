@@ -167,7 +167,8 @@ textarea {
 }
 
 .menu a,
-.sidebar-rodape a {
+.sidebar-rodape a,
+.sidebar-rodape button {
     position: relative;
     display: flex;
     align-items: center;
@@ -183,9 +184,18 @@ textarea {
 }
 
 .menu a:hover,
-.sidebar-rodape a:hover {
+.sidebar-rodape a:hover,
+.sidebar-rodape button:hover {
     color: #fff;
     background: rgba(255, 255, 255, .06);
+}
+
+.sidebar-rodape button {
+    width: 100%;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
 }
 
 .menu a.ativo {
@@ -1094,7 +1104,7 @@ textarea {
 
 .semana {
     display: grid;
-    grid-template-columns: repeat(5, minmax(190px, 1fr));
+    grid-template-columns: repeat(5, minmax(160px, 1fr));
     gap: 12px;
     overflow-x: auto;
     padding-bottom: 4px;
@@ -1906,11 +1916,18 @@ textarea {
 }
 
 .linha-item.lanche {
-    grid-template-columns: 2fr 1.2fr .8fr .8fr auto;
+    grid-template-columns: 1.6fr 1.1fr 1.1fr .8fr auto;
 }
 
 .linha-item.cardapio {
     grid-template-columns: 1.6fr .8fr 1.6fr auto;
+}
+
+/* rótulos em uma linha só, para os campos da linha ficarem alinhados */
+.linha-item .campo > span:first-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .linha-item .btn-icone {
@@ -2102,6 +2119,54 @@ button.lanche-chip:hover {
     color: #ff9d9d;
 }
 
+/* Base de dados: exportar e importar */
+.base-opcoes {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.base-opcao {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    background: var(--superficie-2);
+}
+
+.base-opcao h4 {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.base-opcao p {
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: var(--texto-2);
+}
+
+.base-opcao .btn {
+    min-width: 120px;
+}
+
+.base-opcao-icone {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    color: var(--azul-texto);
+    background: var(--azul-100);
+}
+
+.base-opcao-icone.laranja {
+    color: var(--laranja-700);
+    background: var(--laranja-100);
+}
+
 @media (max-width: 1200px) {
     .stats {
         grid-template-columns: repeat(2, 1fr);
@@ -2282,6 +2347,14 @@ button.lanche-chip:hover {
 
     .modal {
         width: calc(100% - 24px);
+    }
+
+    .base-opcao {
+        grid-template-columns: auto 1fr;
+    }
+
+    .base-opcao .btn {
+        grid-column: 1 / -1;
     }
 
     .modal,

@@ -18,27 +18,28 @@
         </a>
 
         <nav class="menu">
-            <a href="#inicio"><span class="icone">space_dashboard</span>Início</a>
+            <a href="#inicio"><span class="icone" aria-hidden="true">space_dashboard</span>Início</a>
 
             <p class="menu-grupo">Merenda</p>
-            <a href="#agendamento"><span class="icone">calendar_month</span>Agendamento de lanches</a>
-            <a href="#entrega-lanche"><span class="icone">fact_check</span>Entrega de lanches</a>
-            <a href="#cardapios"><span class="icone">menu_book</span>Cardápios</a>
-            <a href="#lanches"><span class="icone">lunch_dining</span>Lanches</a>
+            <a href="#agendamento"><span class="icone" aria-hidden="true">calendar_month</span>Agendamento de lanches</a>
+            <a href="#entrega-lanche"><span class="icone" aria-hidden="true">fact_check</span>Entrega de lanches</a>
+            <a href="#cardapios"><span class="icone" aria-hidden="true">menu_book</span>Cardápios</a>
+            <a href="#lanches"><span class="icone" aria-hidden="true">lunch_dining</span>Lanches</a>
 
             <p class="menu-grupo">Estoque</p>
-            <a href="#alimentos"><span class="icone">nutrition</span>Alimentos</a>
-            <a href="#produtos"><span class="icone">inventory_2</span>Produtos</a>
+            <a href="#alimentos"><span class="icone" aria-hidden="true">nutrition</span>Alimentos</a>
+            <a href="#produtos"><span class="icone" aria-hidden="true">inventory_2</span>Produtos</a>
 
             <p class="menu-grupo">Compras</p>
-            <a href="#fornecedores"><span class="icone">storefront</span>Fornecedores</a>
-            <a href="#empenhos"><span class="icone">receipt_long</span>Empenhos</a>
-            <a href="#agenda-empenho"><span class="icone">local_shipping</span>Entregas de empenho</a>
-            <a href="#recebimento"><span class="icone">move_to_inbox</span>Recebimento</a>
+            <a href="#fornecedores"><span class="icone" aria-hidden="true">storefront</span>Fornecedores</a>
+            <a href="#empenhos"><span class="icone" aria-hidden="true">receipt_long</span>Empenhos</a>
+            <a href="#agenda-empenho"><span class="icone" aria-hidden="true">local_shipping</span>Entregas de empenho</a>
+            <a href="#recebimento"><span class="icone" aria-hidden="true">move_to_inbox</span>Recebimento</a>
         </nav>
 
         <div class="sidebar-rodape">
-            <a href="#inicio"><span class="icone">logout</span>Sair</a>
+            <button type="button" onclick="abrirBaseDados()"><span class="icone" aria-hidden="true">database</span>Exportar / importar dados</button>
+            <a href="#inicio"><span class="icone" aria-hidden="true">logout</span>Sair</a>
         </div>
     </aside>
 
@@ -47,14 +48,14 @@
     <div class="principal">
 
         <header class="topo">
-            <button class="btn-icone btn-menu" onclick="alternarMenu()"><span class="icone">menu</span></button>
+            <button class="btn-icone btn-menu" onclick="alternarMenu()" aria-label="Abrir menu"><span class="icone" aria-hidden="true">menu</span></button>
             <div class="trilha">
                 <span id="trilha-grupo"></span>
-                <span class="icone">chevron_right</span>
+                <span class="icone" aria-hidden="true">chevron_right</span>
                 <strong id="trilha-pagina"></strong>
             </div>
             <div class="topo-acoes">
-                <div class="data-hoje"><span class="icone">today</span><span id="data-hoje"></span></div>
+                <div class="data-hoje"><span class="icone" aria-hidden="true">today</span><span id="data-hoje"></span></div>
                 <div class="usuario">
                     <div class="avatar">AD</div>
                     <div class="usuario-info">
@@ -75,26 +76,26 @@
                         <p>Acompanhe os lanches do dia, as entregas dos fornecedores e o estoque da merenda.</p>
                     </div>
                     <div class="boas-vindas-acoes">
-                        <a class="btn btn-claro" href="#agendamento"><span class="icone">calendar_month</span>Ver agenda</a>
-                        <a class="btn btn-destaque" href="#entrega-lanche"><span class="icone">fact_check</span>Registrar entrega</a>
+                        <a class="btn btn-claro" href="#agendamento"><span class="icone" aria-hidden="true">calendar_month</span>Ver agenda</a>
+                        <a class="btn btn-destaque" href="#entrega-lanche"><span class="icone" aria-hidden="true">fact_check</span>Registrar entrega</a>
                     </div>
                 </div>
 
                 <div class="stats">
                     <div class="stat">
-                        <div class="stat-icone azul"><span class="icone">lunch_dining</span></div>
+                        <div class="stat-icone azul"><span class="icone" aria-hidden="true">lunch_dining</span></div>
                         <div><span>Lanches previstos hoje</span><strong id="stat-lanches"></strong><small id="stat-lanches-info"></small></div>
                     </div>
                     <div class="stat">
-                        <div class="stat-icone ardosia"><span class="icone">local_shipping</span></div>
+                        <div class="stat-icone ardosia"><span class="icone" aria-hidden="true">local_shipping</span></div>
                         <div><span>Entregas pendentes</span><strong id="stat-entregas"></strong><small>solicitadas aos fornecedores</small></div>
                     </div>
                     <div class="stat">
-                        <div class="stat-icone laranja"><span class="icone">warning</span></div>
+                        <div class="stat-icone laranja"><span class="icone" aria-hidden="true">warning</span></div>
                         <div><span>Produtos em falta</span><strong id="stat-abaixo"></strong><small>para a próxima semana</small></div>
                     </div>
                     <div class="stat">
-                        <div class="stat-icone verde"><span class="icone">receipt_long</span></div>
+                        <div class="stat-icone verde"><span class="icone" aria-hidden="true">receipt_long</span></div>
                         <div><span>Empenhos vigentes</span><strong id="stat-empenhos"></strong><small id="stat-empenhos-info"></small></div>
                     </div>
                 </div>
@@ -131,15 +132,15 @@
                         <h1>Agendamento de lanches</h1>
                         <p>Programe os lanches de cada dia e turno. Mais de um lanche no mesmo turno vira opção de escolha para os estudantes.</p>
                     </div>
-                    <button class="btn btn-primario" data-novo="lanche_agendado"><span class="icone">add</span>Agendar lanche</button>
+                    <button class="btn btn-primario" data-novo="lanche_agendado"><span class="icone" aria-hidden="true">add</span>Agendar lanche</button>
                 </div>
 
                 <div class="card">
                     <div class="semana-barra">
                         <div class="semana-nav">
-                            <button class="btn-icone" onclick="mudarSemana(-1)"><span class="icone">chevron_left</span></button>
+                            <button class="btn-icone" onclick="mudarSemana(-1)" aria-label="Semana anterior" title="Semana anterior"><span class="icone" aria-hidden="true">chevron_left</span></button>
                             <strong id="semana-titulo"></strong>
-                            <button class="btn-icone" onclick="mudarSemana(1)"><span class="icone">chevron_right</span></button>
+                            <button class="btn-icone" onclick="mudarSemana(1)" aria-label="Próxima semana" title="Próxima semana"><span class="icone" aria-hidden="true">chevron_right</span></button>
                             <button class="btn btn-fantasma btn-pequeno" onclick="mudarSemana(0)">Semana atual</button>
                         </div>
                         <div class="legenda">
@@ -205,7 +206,7 @@
                         <h1>Cardápios</h1>
                         <p>Combinações de alimentos com a quantidade expressa na unidade base de cada alimento.</p>
                     </div>
-                    <button class="btn btn-primario" data-novo="cardapio"><span class="icone">add</span>Novo cardápio</button>
+                    <button class="btn btn-primario" data-novo="cardapio"><span class="icone" aria-hidden="true">add</span>Novo cardápio</button>
                 </div>
                 <div class="cartoes" id="lista-cardapios"></div>
             </section>
@@ -216,7 +217,7 @@
                         <h1>Lanches</h1>
                         <p>Cada lanche define exatamente quais produtos serão entregues e de que forma.</p>
                     </div>
-                    <button class="btn btn-primario" data-novo="lanche"><span class="icone">add</span>Novo lanche</button>
+                    <button class="btn btn-primario" data-novo="lanche"><span class="icone" aria-hidden="true">add</span>Novo lanche</button>
                 </div>
 
                 <div class="referencias">
@@ -234,12 +235,12 @@
                         <h1>Alimentos</h1>
                         <p>Cadastro genérico dos alimentos que compõem os cardápios.</p>
                     </div>
-                    <button class="btn btn-primario" data-novo="alimento"><span class="icone">add</span>Novo alimento</button>
+                    <button class="btn btn-primario" data-novo="alimento"><span class="icone" aria-hidden="true">add</span>Novo alimento</button>
                 </div>
 
                 <div class="card" data-filtragem>
                     <div class="card-barra">
-                        <label class="busca"><span class="icone">search</span><input type="search" placeholder="Buscar alimento"></label>
+                        <label class="busca"><span class="icone" aria-hidden="true">search</span><input type="search" placeholder="Buscar alimento"></label>
                         <div class="chips">
                             <button class="ativo" data-filtro="">Todos</button>
                             <button data-filtro="comida">Comida</button>
@@ -263,12 +264,12 @@
                         <h1>Produtos</h1>
                         <p>Apresentações concretas dos alimentos, com embalagem, subitens e estoque.</p>
                     </div>
-                    <button class="btn btn-primario" data-novo="produto"><span class="icone">add</span>Novo produto</button>
+                    <button class="btn btn-primario" data-novo="produto"><span class="icone" aria-hidden="true">add</span>Novo produto</button>
                 </div>
 
                 <div class="card" data-filtragem>
                     <div class="card-barra">
-                        <label class="busca"><span class="icone">search</span><input type="search" placeholder="Buscar produto"></label>
+                        <label class="busca"><span class="icone" aria-hidden="true">search</span><input type="search" placeholder="Buscar produto"></label>
                         <div class="chips">
                             <button class="ativo" data-filtro="">Todos</button>
                             <button data-filtro="comida">Comida</button>
@@ -292,12 +293,12 @@
                         <h1>Fornecedores</h1>
                         <p>Empresas com contrato de empenho firmado com o campus.</p>
                     </div>
-                    <button class="btn btn-primario" data-novo="fornecedor"><span class="icone">add</span>Novo fornecedor</button>
+                    <button class="btn btn-primario" data-novo="fornecedor"><span class="icone" aria-hidden="true">add</span>Novo fornecedor</button>
                 </div>
 
                 <div class="card" data-filtragem>
                     <div class="card-barra">
-                        <label class="busca"><span class="icone">search</span><input type="search" placeholder="Buscar por nome ou CNPJ"></label>
+                        <label class="busca"><span class="icone" aria-hidden="true">search</span><input type="search" placeholder="Buscar por nome ou CNPJ"></label>
                     </div>
                     <div class="tabela-wrap tabela-embutida">
                         <table class="tabela">
@@ -316,12 +317,12 @@
                         <h1>Empenhos</h1>
                         <p>Contratos informados pelo setor de compras, com os itens e quantidades empenhadas.</p>
                     </div>
-                    <button class="btn btn-primario" data-novo="empenho"><span class="icone">add</span>Registrar empenho</button>
+                    <button class="btn btn-primario" data-novo="empenho"><span class="icone" aria-hidden="true">add</span>Registrar empenho</button>
                 </div>
 
                 <div data-filtragem>
                     <div class="barra-solta">
-                        <label class="busca"><span class="icone">search</span><input type="search" placeholder="Buscar empenho, fornecedor ou produto"></label>
+                        <label class="busca"><span class="icone" aria-hidden="true">search</span><input type="search" placeholder="Buscar empenho, fornecedor ou produto"></label>
                         <div class="chips">
                             <button class="ativo" data-filtro="">Todos</button>
                             <button data-filtro="vigente">Vigentes</button>
@@ -338,12 +339,12 @@
                         <h1>Entregas de empenho</h1>
                         <p>Solicitações de entrega feitas aos fornecedores a partir do saldo dos empenhos.</p>
                     </div>
-                    <button class="btn btn-primario" data-novo="agenda_entrega_empenho"><span class="icone">add</span>Solicitar entrega</button>
+                    <button class="btn btn-primario" data-novo="agenda_entrega_empenho"><span class="icone" aria-hidden="true">add</span>Solicitar entrega</button>
                 </div>
 
                 <div class="card" data-filtragem>
                     <div class="card-barra">
-                        <label class="busca"><span class="icone">search</span><input type="search" placeholder="Buscar solicitação"></label>
+                        <label class="busca"><span class="icone" aria-hidden="true">search</span><input type="search" placeholder="Buscar solicitação"></label>
                         <div class="chips">
                             <button class="ativo" data-filtro="">Todas</button>
                             <button data-filtro="agendado">Agendadas</button>
@@ -396,7 +397,7 @@
             <input type="hidden" name="id">
             <header class="modal-topo">
                 <div><h2>Agendar lanche</h2><p>Escolha o dia, o turno e o lanche que será servido.</p></div>
-                <button type="button" class="btn-icone" data-fechar><span class="icone">close</span></button>
+                <button type="button" class="btn-icone" data-fechar aria-label="Fechar"><span class="icone" aria-hidden="true">close</span></button>
             </header>
             <div class="modal-corpo">
                 <div class="campos">
@@ -412,11 +413,11 @@
                     <label class="campo"><span>Quantidade prevista</span><input type="number" name="quant_prevista" min="1" step="1" placeholder="Ex.: 140" required></label>
                     <label class="campo"><span>Situação</span><input type="text" value="Agendado" disabled></label>
                     <label class="campo campo-largo"><span>Observações</span><textarea name="observacoes" rows="3" placeholder="Opcional"></textarea></label>
-                    <div class="dica campo-largo"><span class="icone">lightbulb</span><p>Para oferecer duas opções no mesmo turno, agende outro lanche com a mesma data e turno.</p></div>
+                    <div class="dica campo-largo"><span class="icone" aria-hidden="true">lightbulb</span><p>Para oferecer duas opções no mesmo turno, agende outro lanche com a mesma data e turno.</p></div>
                 </div>
             </div>
             <footer class="modal-rodape">
-                <button type="button" class="btn btn-perigo" data-excluir="lanche_agendado" hidden><span class="icone">delete</span>Excluir</button>
+                <button type="button" class="btn btn-perigo" data-excluir="lanche_agendado" hidden><span class="icone" aria-hidden="true">delete</span>Excluir</button>
                 <button type="button" class="btn btn-fantasma" data-fechar>Cancelar</button>
                 <button class="btn btn-primario">Salvar agendamento</button>
             </footer>
@@ -428,7 +429,7 @@
             <input type="hidden" name="id">
             <header class="modal-topo">
                 <div><h2>Cardápio</h2><p>Monte a lista de alimentos e a quantidade de cada um.</p></div>
-                <button type="button" class="btn-icone" data-fechar><span class="icone">close</span></button>
+                <button type="button" class="btn-icone" data-fechar aria-label="Fechar"><span class="icone" aria-hidden="true">close</span></button>
             </header>
             <div class="modal-corpo">
                 <div class="campos">
@@ -441,13 +442,13 @@
                         <label class="campo"><span>Alimento</span><select data-campo="fk_alimento" data-opcoes="alimentos" required onchange="mostrarUnidadeLinha(this)"></select></label>
                         <label class="campo"><span>Quantidade <i class="unidade-campo" data-unidade></i></span><input type="number" data-campo="quant" step="any" min="0.001" placeholder="Ex.: 0,25" required></label>
                         <label class="campo"><span>Descrição</span><input type="text" data-campo="descricao" placeholder="Opcional"></label>
-                        <button type="button" class="btn-icone" data-remover title="Remover"><span class="icone">delete</span></button>
+                        <button type="button" class="btn-icone" data-remover title="Remover"><span class="icone" aria-hidden="true">delete</span></button>
                     </div>
                 </div>
-                <button type="button" class="btn-adicionar" data-adicionar><span class="icone">add</span>Adicionar item</button>
+                <button type="button" class="btn-adicionar" data-adicionar><span class="icone" aria-hidden="true">add</span>Adicionar item</button>
             </div>
             <footer class="modal-rodape">
-                <button type="button" class="btn btn-perigo" data-excluir="cardapio" hidden><span class="icone">delete</span>Excluir</button>
+                <button type="button" class="btn btn-perigo" data-excluir="cardapio" hidden><span class="icone" aria-hidden="true">delete</span>Excluir</button>
                 <button type="button" class="btn btn-fantasma" data-fechar>Cancelar</button>
                 <button class="btn btn-primario">Salvar cardápio</button>
             </footer>
@@ -459,7 +460,7 @@
             <input type="hidden" name="id">
             <header class="modal-topo">
                 <div><h2>Lanche</h2><p>Defina os produtos que serão entregues a partir de um cardápio.</p></div>
-                <button type="button" class="btn-icone" data-fechar><span class="icone">close</span></button>
+                <button type="button" class="btn-icone" data-fechar aria-label="Fechar"><span class="icone" aria-hidden="true">close</span></button>
             </header>
             <div class="modal-corpo">
                 <div class="campos">
@@ -473,14 +474,14 @@
                         <label class="campo"><span>Referência</span><select data-campo="referencia_consumo" onchange="ajustarReferencia(this.closest('.linha-item'))"><option value="inteiro">Inteiro</option><option value="unidade_base">Unidade base</option><option value="subitens">Subitens</option></select></label>
                         <label class="campo"><span>Quantidade <i class="unidade-campo" data-unidade></i></span><input type="number" data-campo="quant_consumida" step="any" min="0.001" placeholder="Ex.: 1" required></label>
                         <label class="campo"><span>Conversão</span><input type="number" data-campo="conversao_subitens" step="any" min="1" placeholder="Auto" disabled></label>
-                        <button type="button" class="btn-icone" data-remover title="Remover"><span class="icone">delete</span></button>
+                        <button type="button" class="btn-icone" data-remover title="Remover"><span class="icone" aria-hidden="true">delete</span></button>
                     </div>
                 </div>
-                <button type="button" class="btn-adicionar" data-adicionar><span class="icone">add</span>Adicionar item</button>
-                <div class="dica"><span class="icone">info</span><p>Só aparecem produtos dos alimentos do cardápio escolhido. A conversão só é usada em subitens: deixe em branco para usar a quantidade de subitens cadastrada no produto.</p></div>
+                <button type="button" class="btn-adicionar" data-adicionar><span class="icone" aria-hidden="true">add</span>Adicionar item</button>
+                <div class="dica"><span class="icone" aria-hidden="true">info</span><p>Só aparecem produtos dos alimentos do cardápio escolhido. A conversão só é usada em subitens: deixe em branco para usar a quantidade de subitens cadastrada no produto.</p></div>
             </div>
             <footer class="modal-rodape">
-                <button type="button" class="btn btn-perigo" data-excluir="lanche" hidden><span class="icone">delete</span>Excluir</button>
+                <button type="button" class="btn btn-perigo" data-excluir="lanche" hidden><span class="icone" aria-hidden="true">delete</span>Excluir</button>
                 <button type="button" class="btn btn-fantasma" data-fechar>Cancelar</button>
                 <button class="btn btn-primario">Salvar lanche</button>
             </footer>
@@ -492,7 +493,7 @@
             <input type="hidden" name="id">
             <header class="modal-topo">
                 <div><h2>Alimento</h2><p>Entidade genérica usada na montagem dos cardápios.</p></div>
-                <button type="button" class="btn-icone" data-fechar><span class="icone">close</span></button>
+                <button type="button" class="btn-icone" data-fechar aria-label="Fechar"><span class="icone" aria-hidden="true">close</span></button>
             </header>
             <div class="modal-corpo">
                 <div class="campos">
@@ -527,7 +528,7 @@
             <input type="hidden" name="id">
             <header class="modal-topo">
                 <div><h2>Produto</h2><p>Apresentação concreta de um alimento adquirido.</p></div>
-                <button type="button" class="btn-icone" data-fechar><span class="icone">close</span></button>
+                <button type="button" class="btn-icone" data-fechar aria-label="Fechar"><span class="icone" aria-hidden="true">close</span></button>
             </header>
             <div class="modal-corpo">
                 <div class="campos">
@@ -541,7 +542,7 @@
                     <label class="campo"><span>Estoque atual</span><input type="number" name="total_estoque" step="any" min="0" placeholder="0"></label>
                     <label class="campo"><span>Quantidade de subitens</span><input type="number" name="quant_subitens" step="any" min="1" placeholder="Ex.: 40"></label>
                     <label class="campo"><span>Nome do subitem</span><input type="text" name="nome_subitem" placeholder="Ex.: biscoitos"></label>
-                    <div class="dica campo-largo"><span class="icone">lightbulb</span><p>Um pacote de biscoito de 400g tem quantidade unitária base 0,4 Kg e aproximadamente 40 subitens. O estoque aumenta sozinho a cada recebimento e diminui a cada entrega de lanche; edite aqui só para corrigir.</p></div>
+                    <div class="dica campo-largo"><span class="icone" aria-hidden="true">lightbulb</span><p>Um pacote de biscoito de 400g tem quantidade unitária base 0,4 Kg e aproximadamente 40 subitens. O estoque aumenta sozinho a cada recebimento e diminui a cada entrega de lanche; edite aqui só para corrigir.</p></div>
                 </div>
             </div>
             <footer class="modal-rodape">
@@ -556,7 +557,7 @@
             <input type="hidden" name="id">
             <header class="modal-topo">
                 <div><h2>Fornecedor</h2><p>Empresa com contrato de empenho firmado.</p></div>
-                <button type="button" class="btn-icone" data-fechar><span class="icone">close</span></button>
+                <button type="button" class="btn-icone" data-fechar aria-label="Fechar"><span class="icone" aria-hidden="true">close</span></button>
             </header>
             <div class="modal-corpo">
                 <div class="campos">
@@ -578,7 +579,7 @@
             <input type="hidden" name="id">
             <header class="modal-topo">
                 <div><h2>Empenho</h2><p>Lance o contrato informado pelo setor de compras.</p></div>
-                <button type="button" class="btn-icone" data-fechar><span class="icone">close</span></button>
+                <button type="button" class="btn-icone" data-fechar aria-label="Fechar"><span class="icone" aria-hidden="true">close</span></button>
             </header>
             <div class="modal-corpo">
                 <div class="campos">
@@ -592,13 +593,13 @@
                     <div class="linha-item">
                         <label class="campo"><span>Produto</span><select data-campo="fk_produto" data-opcoes="produtos" required></select></label>
                         <label class="campo"><span>Quantidade empenhada</span><input type="number" data-campo="quant_empenhada" step="any" min="0.001" placeholder="Ex.: 1000" required></label>
-                        <button type="button" class="btn-icone" data-remover title="Remover"><span class="icone">delete</span></button>
+                        <button type="button" class="btn-icone" data-remover title="Remover"><span class="icone" aria-hidden="true">delete</span></button>
                     </div>
                 </div>
-                <button type="button" class="btn-adicionar" data-adicionar><span class="icone">add</span>Adicionar item</button>
+                <button type="button" class="btn-adicionar" data-adicionar><span class="icone" aria-hidden="true">add</span>Adicionar item</button>
             </div>
             <footer class="modal-rodape">
-                <button type="button" class="btn btn-perigo" data-excluir="empenho" hidden><span class="icone">delete</span>Excluir</button>
+                <button type="button" class="btn btn-perigo" data-excluir="empenho" hidden><span class="icone" aria-hidden="true">delete</span>Excluir</button>
                 <button type="button" class="btn btn-fantasma" data-fechar>Cancelar</button>
                 <button class="btn btn-primario">Salvar empenho</button>
             </footer>
@@ -610,7 +611,7 @@
             <input type="hidden" name="id">
             <header class="modal-topo">
                 <div><h2>Solicitar entrega</h2><p>Agende a entrega de um item do empenho com o fornecedor.</p></div>
-                <button type="button" class="btn-icone" data-fechar><span class="icone">close</span></button>
+                <button type="button" class="btn-icone" data-fechar aria-label="Fechar"><span class="icone" aria-hidden="true">close</span></button>
             </header>
             <div class="modal-corpo">
                 <div class="campos">
@@ -619,12 +620,40 @@
                     <label class="campo"><span>Quantidade solicitada</span><input name="quant_solicitada" type="number" step="any" min="0.001" placeholder="Ex.: 300" required></label>
                     <label class="campo"><span>Data prevista de entrega</span><input type="date" name="data_prevista_entrega" required></label>
                     <label class="campo campo-largo"><span>Observação</span><textarea name="observacao" rows="2" placeholder="Opcional"></textarea></label>
-                    <div class="dica campo-largo"><span class="icone">info</span><p>A quantidade não pode passar do saldo do item que ainda não foi solicitado. A data da solicitação é registrada automaticamente e o estado inicial é “Agendado”.</p></div>
+                    <div class="dica campo-largo"><span class="icone" aria-hidden="true">info</span><p>A quantidade não pode passar do saldo do item que ainda não foi solicitado. A data da solicitação é registrada automaticamente e o estado inicial é “Agendado”.</p></div>
                 </div>
             </div>
             <footer class="modal-rodape">
                 <button type="button" class="btn btn-fantasma" data-fechar>Cancelar</button>
                 <button class="btn btn-primario">Solicitar entrega</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <dialog class="modal" id="modal-base-dados">
+        <form method="dialog" id="form-base-dados">
+            <header class="modal-topo">
+                <div><h2>Base de dados</h2><p>Os dados ficam salvos só neste navegador. Use um arquivo de cópia para levá-los a outro aparelho.</p></div>
+                <button type="button" class="btn-icone" data-fechar aria-label="Fechar"><span class="icone" aria-hidden="true">close</span></button>
+            </header>
+            <div class="modal-corpo">
+                <div class="base-opcoes">
+                    <div class="base-opcao">
+                        <div class="base-opcao-icone"><span class="icone" aria-hidden="true">download</span></div>
+                        <div><h4>Exportar banco de dados</h4><p>Baixa um arquivo com todos os cadastros, agendamentos, entregas e o estoque.</p></div>
+                        <button type="button" class="btn btn-primario" onclick="comBotao(this, exportarBanco)"><span class="icone" aria-hidden="true">download</span>Exportar</button>
+                    </div>
+                    <div class="base-opcao">
+                        <div class="base-opcao-icone laranja"><span class="icone" aria-hidden="true">upload</span></div>
+                        <div><h4>Importar banco de dados</h4><p>Carrega um arquivo exportado. Os dados atuais deste aparelho são substituídos pelos do arquivo.</p></div>
+                        <button type="button" class="btn btn-destaque" onclick="el('arquivo-base-dados').click()"><span class="icone" aria-hidden="true">upload</span>Importar</button>
+                        <input type="file" id="arquivo-base-dados" accept=".json,application/json" hidden onchange="importarBanco(this)">
+                    </div>
+                </div>
+                <div class="dica"><span class="icone" aria-hidden="true">lightbulb</span><p>Para trocar de aparelho: exporte aqui, copie o arquivo para o novo aparelho (pen drive, e-mail, nuvem) e importe por este mesmo botão.</p></div>
+            </div>
+            <footer class="modal-rodape">
+                <button type="button" class="btn btn-fantasma" data-fechar>Fechar</button>
             </footer>
         </form>
     </dialog>
