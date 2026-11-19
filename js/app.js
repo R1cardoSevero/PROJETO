@@ -783,7 +783,7 @@ function preencherLanche(form, registro) {
             ajustarReferencia(linha);
         }
     });
-    
+}
 
 // Os itens do lanche são recriados a cada gravação: enquanto o lanche não foi entregue,
 // nenhum outro registro aponta para eles.
@@ -912,7 +912,7 @@ function ajustarReferencia(linha) {
     conversao.disabled = referencia.value !== "subitens";
     conversao.placeholder = produto && produto.quant_subitens ? `Auto (${num(produto.quant_subitens)})` : "Auto";
     if (conversao.disabled) conversao.value = "";
-    
+
     const unidade = unidadeConsumo(referencia.value, produto);
     linha.querySelector("[data-unidade]").textContent = unidade || "—";
 }
