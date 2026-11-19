@@ -777,8 +777,13 @@ function preencherLanche(form, registro) {
     if (registro) preencherCampos(form, registro);
     const linhas = definirLinhas(form, itens.length || 2);
     filtrarProdutosLanche(form);
-    linhas.forEach((linha, i) => itens[i] && preencherLinha(linha, itens[i]));
-}
+    linhas.forEach((linha, i) => {
+        if (itens[i]) {
+            preencherLinha(linha, itens[i]);
+            ajustarReferencia(linha);
+        }
+    });
+    
 
 // Os itens do lanche são recriados a cada gravação: enquanto o lanche não foi entregue,
 // nenhum outro registro aponta para eles.
@@ -907,7 +912,9 @@ function ajustarReferencia(linha) {
     conversao.disabled = referencia.value !== "subitens";
     conversao.placeholder = produto && produto.quant_subitens ? `Auto (${num(produto.quant_subitens)})` : "Auto";
     if (conversao.disabled) conversao.value = "";
-    linha.querySelector("[data-unidade]").textContent = unidadeConsumo(referencia.value, produto);
+    
+    const unidade = unidadeConsumo(referencia.value, produto);
+    linha.querySelector("[data-unidade]").textContent = unidade || "—";
 }
 
 // ---------------------------------------------------------------------------------------------
