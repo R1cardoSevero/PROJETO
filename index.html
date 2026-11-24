@@ -119,7 +119,7 @@
 
                 <div class="card">
                     <div class="card-topo">
-                        <div><h3>Estoque dos produtos</h3><p>Disponível em relação ao total provisionado nos empenhos vigentes</p></div>
+                        <div><h3>Estoque dos produtos</h3><p>Estoque local disponível dos produtos cadastrados</p></div>
                         <a class="link" href="#produtos">Ver produtos</a>
                     </div>
                     <div class="estoque-grade" id="inicio-estoque"></div>
@@ -130,7 +130,7 @@
                 <div class="pagina-topo">
                     <div>
                         <h1>Agendamento de lanches</h1>
-                        <p>Programe os lanches de cada dia e turno. Mais de um lanche no mesmo turno vira opção de escolha para os estudantes.</p>
+                        <p>Programe os lanches de cada dia e turno em formato de planilha. Mais de um lanche no mesmo turno vira opção de escolha para os estudantes.</p>
                     </div>
                     <button class="btn btn-primario" data-novo="lanche_agendado"><span class="icone" aria-hidden="true">add</span>Agendar lanche</button>
                 </div>
@@ -148,7 +148,20 @@
                             <span><i class="ponto entregue"></i>Entregue</span>
                         </div>
                     </div>
-                    <div class="semana" id="semana"></div>
+                    <div class="tabela-wrap tabela-embutida">
+                        <table class="tabela tabela-planilha-agendamento">
+                            <thead>
+                                <tr>
+                                    <th>Dia / Turno</th>
+                                    <th>Lanche / Opção</th>
+                                    <th class="num">Qtd. Lanches</th>
+                                    <th>Situação</th>
+                                    <th class="acoes">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-agendamento-planilha"></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div class="card">
@@ -204,11 +217,23 @@
                 <div class="pagina-topo">
                     <div>
                         <h1>Cardápios</h1>
-                        <p>Combinações de alimentos com a quantidade expressa na unidade base de cada alimento.</p>
+                        <p>Combinações de alimentos com a quantidade expressa na unidade base ou múltiplo compatível de cada alimento.</p>
                     </div>
                     <button class="btn btn-primario" data-novo="cardapio"><span class="icone" aria-hidden="true">add</span>Novo cardápio</button>
                 </div>
-                <div class="cartoes" id="lista-cardapios"></div>
+                <div class="card" data-filtragem>
+                    <div class="card-barra">
+                        <label class="busca"><span class="icone" aria-hidden="true">search</span><input type="search" placeholder="Buscar cardápio"></label>
+                    </div>
+                    <div class="tabela-wrap tabela-embutida">
+                        <table class="tabela">
+                            <thead>
+                                <tr><th>Código</th><th>Nome</th><th>Descrição</th><th class="num">Lanches vinculados</th><th></th></tr>
+                            </thead>
+                            <tbody id="lista-cardapios" data-itens></tbody>
+                        </table>
+                    </div>
+                </div>
             </section>
 
             <section class="pagina" data-pagina="lanches">
@@ -221,12 +246,24 @@
                 </div>
 
                 <div class="referencias">
-                    <div><span class="ref ref-inteiro">Inteiro</span><p>Quantidade do produto inteiro: 1 caixa, 2 pastéis, ¼ de cuca.</p></div>
-                    <div><span class="ref ref-base">Unidade base</span><p>Na unidade do alimento: 0,2 L de suco, 0,3 Kg de banana.</p></div>
-                    <div><span class="ref ref-subitens">Subitens</span><p>Partes do produto: 4 biscoitos de um pacote com 40.</p></div>
+                    <div><span class="ref ref-inteiro">Inteiro ou fração</span><p>Quantidade do produto inteiro ou em partes: 1 caixa, 2 pastéis, ¼ de cuca. Unidade de consumo: unidade.</p></div>
+                    <div><span class="ref ref-base">Unidade de medida base</span><p>Na unidade do alimento (ou múltiplo): 0,2 L de suco, 300 g de banana.</p></div>
+                    <div><span class="ref ref-subitens">Subitens</span><p>Partes do produto: 4 biscoitos de um pacote com 40. Indisponível para produtos não particionáveis.</p></div>
                 </div>
 
-                <div class="cartoes" id="lista-lanches"></div>
+                <div class="card" data-filtragem>
+                    <div class="card-barra">
+                        <label class="busca"><span class="icone" aria-hidden="true">search</span><input type="search" placeholder="Buscar lanche"></label>
+                    </div>
+                    <div class="tabela-wrap tabela-embutida">
+                        <table class="tabela">
+                            <thead>
+                                <tr><th>Código</th><th>Descrição / Cardápio</th><th>Itens e consumos</th><th>Situação</th><th></th></tr>
+                            </thead>
+                            <tbody id="lista-lanches" data-itens></tbody>
+                        </table>
+                    </div>
+                </div>
             </section>
 
             <section class="pagina" data-pagina="alimentos">
@@ -250,7 +287,7 @@
                     <div class="tabela-wrap tabela-embutida">
                         <table class="tabela">
                             <thead>
-                                <tr><th>Alimento</th><th>Natureza</th><th>Grupo</th><th>Unidade base</th><th class="num">Produtos</th><th></th></tr>
+                                <tr><th>Alimento</th><th>Natureza</th><th>Grupo</th><th>Unidade base</th><th class="num">Estoque local</th><th class="num">Estoque provisionado</th><th></th></tr>
                             </thead>
                             <tbody id="tabela-alimentos" data-itens></tbody>
                         </table>
@@ -262,9 +299,12 @@
                 <div class="pagina-topo">
                     <div>
                         <h1>Produtos</h1>
-                        <p>Apresentações concretas dos alimentos, com embalagem, subitens e estoque.</p>
+                        <p>Apresentações concretas dos alimentos, com embalagem, estoque local e provisionado.</p>
                     </div>
-                    <button class="btn btn-primario" data-novo="produto"><span class="icone" aria-hidden="true">add</span>Novo produto</button>
+                    <div class="pagina-topo-acoes">
+                        <button class="btn btn-fantasma" data-novo="perda"><span class="icone" aria-hidden="true">remove_shopping_cart</span>Registrar perda</button>
+                        <button class="btn btn-primario" data-novo="produto"><span class="icone" aria-hidden="true">add</span>Novo produto</button>
+                    </div>
                 </div>
 
                 <div class="card" data-filtragem>
@@ -279,9 +319,23 @@
                     <div class="tabela-wrap tabela-embutida">
                         <table class="tabela">
                             <thead>
-                                <tr><th>Produto</th><th>Quant. unitária base</th><th>Subitens</th><th>Estoque disponível</th><th class="num">Provisionado</th><th></th></tr>
+                                <tr><th>Alimento/Produto</th><th>Quant. unitária base</th><th>Estoque Local / Provisionado</th><th></th></tr>
                             </thead>
                             <tbody id="tabela-produtos" data-itens></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-topo">
+                        <div><h3>Perdas registradas</h3><p>Alimentos perdidos (vencidos, estragados, sobras não reaproveitadas). Cada perda desconta do estoque local; excluir o registro devolve a quantidade.</p></div>
+                    </div>
+                    <div class="tabela-wrap tabela-embutida">
+                        <table class="tabela">
+                            <thead>
+                                <tr><th>Data</th><th>Produto</th><th class="num">Quantidade</th><th>Motivo</th><th></th></tr>
+                            </thead>
+                            <tbody id="tabela-perdas"></tbody>
                         </table>
                     </div>
                 </div>
@@ -368,7 +422,7 @@
                 <div class="pagina-topo">
                     <div>
                         <h1>Recebimento de produtos</h1>
-                        <p>Confirme as entregas feitas pelos fornecedores. O estoque disponível é atualizado com a quantidade recebida. Se uma entrega parcial não for completada, finalize a solicitação para devolver o restante ao saldo do empenho.</p>
+                        <p>Confirme as entregas feitas pelos fornecedores. O estoque local é atualizado com a quantidade recebida. Se uma entrega parcial não for completada, finalize a solicitação para devolver o restante ao saldo do empenho.</p>
                     </div>
                 </div>
 
@@ -402,7 +456,7 @@
             <div class="modal-corpo">
                 <div class="campos">
                     <label class="campo"><span>Data</span><input type="date" name="data" required></label>
-                    <div class="campo">
+                    <div class="campo obrigatorio">
                         <span>Turno</span>
                         <div class="segmentado">
                             <label><input type="radio" name="turno" value="manha" checked><span>Manhã</span></label>
@@ -410,9 +464,9 @@
                         </div>
                     </div>
                     <label class="campo campo-largo"><span>Lanche</span><select name="fk_lanche" data-opcoes="lanches" required></select></label>
-                    <label class="campo"><span>Quantidade prevista</span><input type="number" name="quant_prevista" min="1" step="1" placeholder="Ex.: 140" required></label>
+                    <label class="campo"><span>Quantidade prevista</span><input type="number" name="quantidade" min="1" max="9999" step="1" placeholder="Ex.: 140" required></label>
                     <label class="campo"><span>Situação</span><input type="text" value="Agendado" disabled></label>
-                    <label class="campo campo-largo"><span>Observações</span><textarea name="observacoes" rows="3" placeholder="Opcional"></textarea></label>
+                    <label class="campo campo-largo"><span>Observações</span><textarea name="observacoes" rows="3" maxlength="350" placeholder="Opcional"></textarea></label>
                     <div class="dica campo-largo"><span class="icone" aria-hidden="true">lightbulb</span><p>Para oferecer duas opções no mesmo turno, agende outro lanche com a mesma data e turno.</p></div>
                 </div>
             </div>
@@ -424,7 +478,7 @@
         </form>
     </dialog>
 
-    <dialog class="modal" id="modal-cardapio">
+    <dialog class="modal modal-largo" id="modal-cardapio">
         <form method="dialog" data-tabela="cardapio">
             <input type="hidden" name="id">
             <header class="modal-topo">
@@ -433,15 +487,21 @@
             </header>
             <div class="modal-corpo">
                 <div class="campos">
-                    <label class="campo campo-largo"><span>Nome</span><input type="text" name="nome" placeholder="Ex.: Banana, biscoito e leite" required></label>
-                    <label class="campo campo-largo"><span>Descrição</span><input type="text" name="descricao" placeholder="Opcional"></label>
+                    <label class="campo campo-largo"><span>Nome</span><input type="text" name="nome" maxlength="50" placeholder="Ex.: Banana, biscoito e leite" required></label>
+                    <label class="campo campo-largo"><span>Descrição</span><input type="text" name="descricao" maxlength="100" placeholder="Opcional"></label>
                 </div>
-                <div class="itens-titulo"><h4>Itens de alimento</h4><span>Quantidade na unidade base do alimento</span></div>
+                <div class="itens-titulo"><h4>Itens de alimento</h4><span>Quantidade na unidade base ou múltiplo compatível</span></div>
                 <div class="itens-form">
                     <div class="linha-item cardapio">
                         <label class="campo"><span>Alimento</span><select data-campo="fk_alimento" data-opcoes="alimentos" required onchange="mostrarUnidadeLinha(this)"></select></label>
-                        <label class="campo"><span>Quantidade <i class="unidade-campo" data-unidade></i></span><input type="number" data-campo="quant" step="any" min="0.001" placeholder="Ex.: 0,25" required></label>
-                        <label class="campo"><span>Descrição</span><input type="text" data-campo="descricao" placeholder="Opcional"></label>
+                        <label class="campo">
+                            <span>Quantidade</span>
+                            <span class="input-sufixo">
+                                <input type="number" data-campo="quant" step="0.001" min="0.001" max="99999.999" placeholder="Ex.: 0,25" required>
+                                <select data-campo="unidade_id" style="width:auto; border:none; background:transparent; font-weight:600;" disabled></select>
+                            </span>
+                        </label>
+                        <label class="campo"><span>Observações</span><input type="text" data-campo="observacoes" maxlength="200" placeholder="Opcional"></label>
                         <button type="button" class="btn-icone" data-remover title="Remover"><span class="icone" aria-hidden="true">delete</span></button>
                     </div>
                 </div>
@@ -458,27 +518,37 @@
     <dialog class="modal modal-largo" id="modal-lanche">
         <form method="dialog" data-tabela="lanche">
             <input type="hidden" name="id">
+            <input type="hidden" name="substitui">
             <header class="modal-topo">
                 <div><h2>Lanche</h2><p>Defina os produtos que serão entregues a partir de um cardápio.</p></div>
                 <button type="button" class="btn-icone" data-fechar aria-label="Fechar"><span class="icone" aria-hidden="true">close</span></button>
             </header>
             <div class="modal-corpo">
+                <div class="dica" data-aviso-substituicao hidden><span class="icone" aria-hidden="true">content_copy</span><p></p></div>
                 <div class="campos">
-                    <label class="campo"><span>Cardápio</span><select name="fk_cardapio" data-opcoes="cardapios" required onchange="filtrarProdutosLanche(this.form)"></select></label>
-                    <label class="campo"><span>Descrição</span><input type="text" name="descricao" placeholder="Ex.: Pastel + suco em caixinha"></label>
+                    <label class="campo"><span>Nome</span><input type="text" name="nome" maxlength="50" placeholder="Ex.: Pastel com suco" required></label>
+                    <label class="campo"><span>Cardápio</span><select name="fk_cardapio" data-opcoes="cardapios" required onchange="aoMudarCardapioLanche(this.form, event)"></select></label>
+                    <label class="campo campo-largo"><span>Descrição</span><input type="text" name="descricao" maxlength="100" placeholder="Ex.: Pastel de carne + suco em caixinha (opcional)"></label>
                 </div>
-                <div class="itens-titulo"><h4>Itens do lanche</h4><span>Produto e forma de consumo</span></div>
+                <div class="itens-titulo"><h4>Itens do lanche</h4><span>Sugeridos automaticamente pelo cardápio (opcional caso ainda não existam produtos)</span></div>
                 <div class="itens-form">
                     <div class="linha-item lanche">
-                        <label class="campo"><span>Produto</span><select data-campo="fk_produto" required disabled onchange="ajustarReferencia(this.closest('.linha-item'))"></select></label>
-                        <label class="campo"><span>Forma de consumo</span><select data-campo="referencia_consumo" onchange="ajustarReferencia(this.closest('.linha-item'))"><option value="inteiro">Inteiro</option><option value="unidade_base">Unidade base</option><option value="subitens">Subitens</option></select></label>
-                        <label class="campo"><span>Quantidade</span><span class="input-sufixo"><input type="number" data-campo="quant_consumida" step="any" min="0.001" placeholder="Ex.: 1" required><em data-unidade>—</em></span></label>
-                        <label class="campo"><span>Conversão</span><input type="number" data-campo="conversao_subitens" step="any" min="1" placeholder="Auto" disabled></label>
+                        <label class="campo"><span>Produto</span><select data-campo="fk_produto" disabled onchange="ajustarReferencia(this.closest('.linha-item'))"></select></label>
+                        <label class="campo"><span>Forma de consumo</span><select data-campo="forma_consumo" onchange="ajustarReferencia(this.closest('.linha-item'))"><option value="inteiro">Inteiro ou fração</option><option value="unidade_base">Unidade de medida base</option><option value="subitens">Subitens</option></select></label>
+                        <label class="campo">
+                            <span>Quantidade</span>
+                            <span class="input-sufixo">
+                                <input type="number" data-campo="quant_consumida" step="0.001" min="0.001" max="99999.999" placeholder="Ex.: 1">
+                                <em data-unidade>—</em>
+                                <select data-campo="unidade_id" style="width:auto; border:none; background:transparent; font-weight:600;" hidden></select>
+                            </span>
+                        </label>
+                        <label class="campo"><span>Conversão (total de subitens)</span><input type="number" data-campo="conversao_subitens" step="1" min="1" max="9999" placeholder="Auto" disabled></label>
                         <button type="button" class="btn-icone" data-remover title="Remover"><span class="icone" aria-hidden="true">delete</span></button>
                     </div>
                 </div>
                 <button type="button" class="btn-adicionar" data-adicionar><span class="icone" aria-hidden="true">add</span>Adicionar item</button>
-                <div class="dica"><span class="icone" aria-hidden="true">info</span><p>Só aparecem produtos dos alimentos do cardápio escolhido. A conversão só é usada em subitens: deixe em branco para usar a quantidade de subitens cadastrada no produto.</p></div>
+                <div class="dica"><span class="icone" aria-hidden="true">info</span><p>Ao selecionar o cardápio, os produtos correspondentes são sugeridos automaticamente. As quantidades devem ser consistentes com o previsto no cardápio. É permitido salvar o lanche mesmo sem produtos cadastrados ainda.</p></div>
             </div>
             <footer class="modal-rodape">
                 <button type="button" class="btn btn-perigo" data-excluir="lanche" hidden><span class="icone" aria-hidden="true">delete</span>Excluir</button>
@@ -497,9 +567,9 @@
             </header>
             <div class="modal-corpo">
                 <div class="campos">
-                    <label class="campo campo-largo"><span>Nome</span><input type="text" name="nome" placeholder="Ex.: Banana" required></label>
-                    <label class="campo campo-largo"><span>Descrição</span><input type="text" name="descricao" placeholder="Ex.: Banana prata"></label>
-                    <div class="campo">
+                    <label class="campo campo-largo"><span>Nome</span><input type="text" name="nome" maxlength="50" placeholder="Ex.: Banana" required></label>
+                    <label class="campo campo-largo"><span>Descrição</span><input type="text" name="descricao" maxlength="100" placeholder="Ex.: Banana prata" required></label>
+                    <div class="campo obrigatorio">
                         <span>Natureza</span>
                         <div class="segmentado">
                             <label><input type="radio" name="natureza" value="comida" checked><span>Comida</span></label>
@@ -508,12 +578,13 @@
                     </div>
                     <label class="campo">
                         <span>Grupo alimentar</span>
-                        <select name="grupo"><option value="fruta">Fruta</option><option value="panifício">Panifício</option><option value="laticínio">Laticínio</option><option value="suco">Suco</option><option value="cereal">Cereal</option><option value="outro">Outro</option></select>
+                        <select name="grupo" required><option value="fruta">Fruta</option><option value="panifício">Panifício</option><option value="laticínio">Laticínio</option><option value="suco">Suco</option><option value="cereal">Cereal</option><option value="outro">Outro</option></select>
                     </label>
                     <label class="campo">
                         <span>Unidade de medida base</span>
                         <select name="fk_unidade_medida" data-opcoes="unidades" required></select>
                     </label>
+                    <div class="dica campo-largo"><span class="icone" aria-hidden="true">lock</span><p>Depois que existir algum produto deste alimento, a unidade de medida base não poderá ser alterada. Antes disso, se a unidade mudar, as quantidades dos cardápios são convertidas (ex.: g para Kg).</p></div>
                 </div>
             </div>
             <footer class="modal-rodape">
@@ -537,17 +608,47 @@
                         <span>Embalagem</span>
                         <select name="embalagem"><option value="un">Unidade (un)</option><option value="pct">Pacote (pct)</option><option value="cx">Caixa (cx)</option><option value="gf">Garrafa (gf)</option><option value="sc">Saco (sc)</option><option value="kg">Quilo (kg)</option></select>
                     </label>
-                    <label class="campo campo-largo"><span>Descrição</span><input type="text" name="descricao" placeholder="Ex.: Pacote 400g" required></label>
-                    <label class="campo"><span>Quantidade unitária base</span><span class="input-sufixo"><input type="number" name="quant_unit_base" step="any" min="0.001" placeholder="0,4" required><em id="produto-unidade">—</em></span></label>
-                    <label class="campo"><span>Estoque atual</span><input type="number" name="total_estoque" step="any" min="0" placeholder="0"></label>
-                    <label class="campo"><span>Quantidade de subitens</span><input type="number" name="quant_subitens" step="any" min="1" placeholder="Ex.: 40"></label>
-                    <label class="campo"><span>Nome do subitem</span><input type="text" name="nome_subitem" placeholder="Ex.: biscoitos"></label>
-                    <div class="dica campo-largo"><span class="icone" aria-hidden="true">lightbulb</span><p>Um pacote de biscoito de 400g tem quantidade unitária base 0,4 Kg e aproximadamente 40 subitens. O estoque aumenta sozinho a cada recebimento e diminui a cada entrega de lanche; edite aqui só para corrigir.</p></div>
+                    <label class="campo campo-largo"><span>Descrição</span><input type="text" name="descricao" maxlength="100" placeholder="Ex.: Pacote 400g" required></label>
+                    <label class="campo">
+                        <span>Quantidade unitária base</span>
+                        <span class="input-sufixo">
+                            <input type="number" name="quant_unit_base" step="0.001" min="0.001" max="99999.999" placeholder="0,4" required>
+                            <select name="unidade_id" id="produto-unidade-select" style="width:auto; border:none; background:transparent; font-weight:600;" disabled><option value="">—</option></select>
+                        </span>
+                    </label>
+                    <label class="campo"><span>Quantidade de subitens</span><input type="number" name="quant_subitens" min="0" max="9999" step="1" placeholder="Ex.: 40" required></label>
+                    <label class="campo"><span>Nome do subitem</span><input type="text" name="nome_subitem" maxlength="40" placeholder="Opcional (ex.: biscoitos)"></label>
+                    <div class="dica campo-largo"><span class="icone" aria-hidden="true">info</span><p>Subitens: informe quantos o produto tem (ex.: 40 biscoitos), <strong>0</strong> se ele não pode ser particionado (ex.: um ovo) ou <strong>1</strong> se pode, mas a quantidade ainda não é conhecida.</p></div>
+                    <label class="campo"><span id="produto-estoque-rotulo">Estoque local</span><input type="number" name="estoque_local" step="0.001" min="0" max="99999.999" value="0" required></label>
+                    <label class="campo"><span>Estoque provisionado</span><input type="number" id="produto-provisionado" value="0" disabled title="Atualizado automaticamente pelos empenhos"></label>
+                    <div class="dica campo-largo"><span class="icone" aria-hidden="true">lightbulb</span><p>Você pode informar a quantidade unitária em múltiplos compatíveis (ex.: 400 g para um alimento em Kg). Após criar o produto, embalagem, quantidade unitária e subitens ficam bloqueados para edição. O estoque local é atualizado pelos recebimentos, entregas de lanche, sobras e perdas, e pode ser ajustado aqui quando houver divergência com o estoque real. O estoque provisionado (empenhado e ainda não entregue) muda só pelos empenhos.</p></div>
                 </div>
             </div>
             <footer class="modal-rodape">
                 <button type="button" class="btn btn-fantasma" data-fechar>Cancelar</button>
                 <button class="btn btn-primario">Salvar produto</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <dialog class="modal" id="modal-perda">
+        <form method="dialog" data-tabela="perda">
+            <input type="hidden" name="id">
+            <header class="modal-topo">
+                <div><h2>Registrar perda</h2><p>Alimento perdido (vencido, estragado, danificado). A quantidade sai do estoque local.</p></div>
+                <button type="button" class="btn-icone" data-fechar aria-label="Fechar"><span class="icone" aria-hidden="true">close</span></button>
+            </header>
+            <div class="modal-corpo">
+                <div class="campos">
+                    <label class="campo campo-largo"><span>Produto</span><select name="fk_produto" data-opcoes="produtos" required></select></label>
+                    <label class="campo"><span>Data</span><input type="date" name="data" required></label>
+                    <label class="campo"><span>Quantidade perdida (unidades do produto)</span><input type="number" name="quantidade" step="0.001" min="0.001" max="99999.999" placeholder="Ex.: 2" required></label>
+                    <label class="campo campo-largo"><span>Motivo</span><input type="text" name="motivo" maxlength="200" placeholder="Ex.: Pacotes vencidos" required></label>
+                </div>
+            </div>
+            <footer class="modal-rodape">
+                <button type="button" class="btn btn-fantasma" data-fechar>Cancelar</button>
+                <button class="btn btn-primario">Registrar perda</button>
             </footer>
         </form>
     </dialog>
@@ -561,10 +662,10 @@
             </header>
             <div class="modal-corpo">
                 <div class="campos">
-                    <label class="campo campo-largo"><span>Razão social</span><input type="text" name="nome" placeholder="Ex.: Padaria Pão do Campo Ltda" required></label>
+                    <label class="campo campo-largo"><span>Razão social</span><input type="text" name="nome" maxlength="150" placeholder="Ex.: Padaria Pão do Campo Ltda" required></label>
                     <label class="campo"><span>CNPJ</span><input type="text" name="cnpj" placeholder="00.000.000/0000-00" maxlength="18" pattern="[0-9A-Za-z]{2}\.[0-9A-Za-z]{3}\.[0-9A-Za-z]{3}/[0-9A-Za-z]{4}-[0-9]{2}" title="CNPJ com 14 caracteres, como 00.000.000/0000-00" data-mascara="cnpj" autocomplete="off" required></label>
                     <label class="campo"><span>Telefone</span><input type="tel" name="telefone" placeholder="(51) 0000-0000" maxlength="15" pattern="\([1-9][0-9]\) [0-9]{4,5}-[0-9]{4}" title="Telefone com DDD, como (51) 3333-4444" data-mascara="telefone" inputmode="tel"></label>
-                    <label class="campo campo-largo"><span>E-mail</span><input type="email" name="email" placeholder="contato@empresa.com.br" maxlength="120" pattern="[^@\s]+@[^@\s]+\.[^@\s]{2,}" title="E-mail como nome@empresa.com.br"></label>
+                    <label class="campo campo-largo"><span>E-mail</span><input type="email" name="email" placeholder="contato@empresa.com.br" maxlength="254" pattern="[^@\s]+@[^@\s]+\.[^@\s]{2,}" title="E-mail como nome@empresa.com.br"></label>
                 </div>
             </div>
             <footer class="modal-rodape">
@@ -583,7 +684,7 @@
             </header>
             <div class="modal-corpo">
                 <div class="campos">
-                    <label class="campo"><span>Número do empenho</span><input type="text" name="sigla" placeholder="Ex.: 2026NE000106" required></label>
+                    <label class="campo"><span>Número do empenho</span><input type="text" name="sigla" maxlength="15" pattern="[0-9A-Za-z]+" title="Somente letras e números, sem espaços ou símbolos" placeholder="Ex.: 2026NE000106" required></label>
                     <label class="campo"><span>Fornecedor</span><select name="fk_fornecedor" data-opcoes="fornecedores" required></select></label>
                     <label class="campo"><span>Data inicial</span><input type="date" name="data_inicial" required oninput="this.form.elements.data_final.min = this.value"></label>
                     <label class="campo"><span>Data final</span><input type="date" name="data_final" required></label>
@@ -592,7 +693,7 @@
                 <div class="itens-form">
                     <div class="linha-item">
                         <label class="campo"><span>Produto</span><select data-campo="fk_produto" data-opcoes="produtos" required></select></label>
-                        <label class="campo"><span>Quantidade empenhada</span><input type="number" data-campo="quant_empenhada" step="any" min="0.001" placeholder="Ex.: 1000" required></label>
+                        <label class="campo"><span>Quantidade empenhada</span><input type="number" data-campo="quant_empenhada" step="0.001" min="0.001" max="99999.999" placeholder="Ex.: 1000" required></label>
                         <button type="button" class="btn-icone" data-remover title="Remover"><span class="icone" aria-hidden="true">delete</span></button>
                     </div>
                 </div>
@@ -606,26 +707,33 @@
         </form>
     </dialog>
 
-    <dialog class="modal" id="modal-agenda-empenho">
+    <dialog class="modal modal-largo" id="modal-agenda-empenho">
         <form method="dialog" data-tabela="agenda_entrega_empenho">
             <input type="hidden" name="id">
             <header class="modal-topo">
-                <div><h2>Solicitar entrega</h2><p>Agende a entrega de um item do empenho com o fornecedor.</p></div>
+                <div><h2>Solicitar entregas de empenho</h2><p>Agende a entrega de um ou mais produtos do empenho com o fornecedor.</p></div>
                 <button type="button" class="btn-icone" data-fechar aria-label="Fechar"><span class="icone" aria-hidden="true">close</span></button>
             </header>
             <div class="modal-corpo">
                 <div class="campos">
                     <label class="campo campo-largo"><span>Empenho</span><select name="fk_empenho" data-opcoes="empenhos" required onchange="preencherItensEmpenho(this.form)"></select></label>
-                    <label class="campo campo-largo"><span>Item do empenho</span><select name="fk_item_empenho" required disabled onchange="limitarQuantidade(this.form)"></select></label>
-                    <label class="campo"><span>Quantidade solicitada</span><input name="quant_solicitada" type="number" step="any" min="0.001" placeholder="Ex.: 300" required></label>
-                    <label class="campo"><span>Data prevista de entrega</span><input type="date" name="data_prevista_entrega" required></label>
-                    <label class="campo campo-largo"><span>Observação</span><textarea name="observacao" rows="2" placeholder="Opcional"></textarea></label>
-                    <div class="dica campo-largo"><span class="icone" aria-hidden="true">info</span><p>A quantidade não pode passar do saldo do item que ainda não foi solicitado. A data da solicitação é registrada automaticamente e o estado inicial é “Agendado”.</p></div>
+                    <label class="campo campo-largo"><span>Observação geral</span><input type="text" name="observacao" maxlength="350" placeholder="Opcional"></label>
                 </div>
+                <div class="itens-titulo"><h4>Produtos a solicitar</h4><span>Informe a quantidade e a data prevista de entrega para cada produto</span></div>
+                <div class="itens-form">
+                    <div class="linha-item">
+                        <label class="campo"><span>Item do empenho</span><select data-campo="fk_item_empenho" required disabled onchange="limitarQuantidadeLinha(this.closest('.linha-item'))"></select></label>
+                        <label class="campo"><span>Quantidade</span><input data-campo="quant_solicitada" type="number" step="0.001" min="0.001" max="99999.999" placeholder="Ex.: 300" required></label>
+                        <label class="campo"><span>Previsto para</span><input type="date" data-campo="data_prevista_entrega" required></label>
+                        <button type="button" class="btn-icone" data-remover title="Remover"><span class="icone" aria-hidden="true">delete</span></button>
+                    </div>
+                </div>
+                <button type="button" class="btn-adicionar" data-adicionar><span class="icone" aria-hidden="true">add</span>Adicionar produto</button>
+                <div class="dica" style="margin-top: 12px;"><span class="icone" aria-hidden="true">info</span><p>A quantidade de cada produto não pode passar do saldo disponível no empenho. A data da solicitação é registrada automaticamente e o estado inicial é “Agendado”.</p></div>
             </div>
             <footer class="modal-rodape">
                 <button type="button" class="btn btn-fantasma" data-fechar>Cancelar</button>
-                <button class="btn btn-primario">Solicitar entrega</button>
+                <button class="btn btn-primario">Solicitar entregas</button>
             </footer>
         </form>
     </dialog>
@@ -663,4 +771,4 @@
     <script src="js/db.js"></script>
     <script src="js/app.js"></script>
 </body>
-</html>
+</html> 

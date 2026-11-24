@@ -2363,3 +2363,32 @@ button.lanche-chip:hover {
         max-height: calc(100dvh - 24px);
     }
 }
+
+/* Campos obrigatórios (legenda da especificação: "* campo obrigatório") */
+.campo:has(> input[required], > select[required], > textarea[required], > .input-sufixo > input[required]) > span:first-child::after,
+.campo.obrigatorio > span:first-child::after {
+    content: " *";
+    color: var(--vermelho-600);
+}
+
+form:has([required]) > .modal-rodape::before {
+    content: "* campo obrigatório";
+    align-self: center;
+    margin-right: auto;
+    font-size: 12px;
+    color: var(--texto-2);
+}
+
+.pagina-topo-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.check-sobra {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    white-space: nowrap;
+}
