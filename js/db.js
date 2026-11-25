@@ -400,8 +400,14 @@ const banco = (() => {
     async function moverEstoque(t, idProduto, { local = 0, provisionado = 0 }, operacao = "a operação") {
         const produto = await t.obter("produto", idProduto);
         const novoLocal = arred(produto.estoque_local + local);
-        if (novoLocal < 0)
-            falhar(`Estoque local insuficiente de "${await nomeDoProduto(t, produto)}": o estoque tem ${produto.estoque_local} e ${operacao} usa ${arred(-local)}. Registre o recebimento do produto ou ajuste o estoque local no cadastro do produto.`);
+        if (novoLocal < 0) {
+            // o estoque é contado em embalagens; mostra também o equivalente na unidade base do alimento
+            const alimento = await t.obter("alimento", produto.fk_alimento);
+            const sigla = await siglaDaUnidade(t, alimento.fk_unidade_medida);
+            const emb = produto.embalagem || "un";
+            const qtd = valor => `${valor} ${emb} (${arred(valor * produto.quant_unit_base)} ${sigla})`;
+            falhar(`Estoque local insuficiente de "${await nomeDoProduto(t, produto)}": o estoque tem ${qtd(produto.estoque_local)} e ${operacao} usa ${qtd(arred(-local))}. O estoque local é contado em embalagens (${emb} de ${produto.quant_unit_base} ${sigla}). Registre o recebimento do produto ou ajuste o estoque local no cadastro do produto.`);
+        }
         t.atualizacaoEstoque = true;
         try {
             await t.salvar("produto", {

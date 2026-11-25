@@ -953,7 +953,18 @@ function filtrarProdutosLanche(form, autopreencher = false) {
             if (!prodsAlimento.length) continue;
             const prod = prodsAlimento[0];
             const unidAlim = unidadeAlimento(prod.fk_alimento);
-            if (unidAlim === "un" && Number.isInteger(itemCard.quant / prod.quant_unit_base)) {
+            // Alimento em "un" não aceita a forma "unidade base": a quantidade do cardápio (em un)
+            // precisa ser convertida para embalagens (inteiro/fração) ou subitens. Sem essa conversão
+            // a linha caía em "inteiro" com a quantidade em un, contando embalagens inteiras.
+            if (unidAlim === "un" && prod.quant_subitens === prod.quant_unit_base && prod.quant_subitens > 1
+                && !Number.isInteger(itemCard.quant / prod.quant_unit_base)) {
+                sugestoes.push({
+                    fk_produto: prod.id,
+                    forma_consumo: "subitens",
+                    quant_consumida: itemCard.quant,
+                    conversao_subitens: prod.quant_subitens
+                });
+            } else if (unidAlim === "un") {
                 sugestoes.push({
                     fk_produto: prod.id,
                     forma_consumo: "inteiro",
@@ -1234,7 +1245,10 @@ function ajustarReferencia(linha) {
     } else {
         selectUnidade.hidden = true;
         textoUnidade.hidden = false;
-        textoUnidade.textContent = unidadeConsumo(referencia.value, produto) || "—";
+        // "Inteiro ou fração" conta embalagens: mostra o conteúdo de cada uma para não confundir com kg/L.
+        textoUnidade.textContent = referencia.value === "inteiro" && produto
+            ? `${embalagem(produto)} (${num(produto.quant_unit_base)} ${unidadeAlimento(produto.fk_alimento)})`
+            : unidadeConsumo(referencia.value, produto) || "—";
     }
 }
 
